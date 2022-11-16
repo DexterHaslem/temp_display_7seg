@@ -1,66 +1,47 @@
-#include "mcc_generated_files/mcc.h"
 
-#include <stdio.h>
+#include "segments.h"
+#include "si7021.h"
 
-uint8_t seg_nums[] = 
-{  
-    //dp G F E D C B A
-    0b00111111,
-    0b00000110,
-    0b01011011,
-    0b01001111,
-    0b01100110,
-    0b01101101,
-    0b01111101,
-    0b00000111,
-    0b01111111,
-    0b01100111,
-};
+#define UPDATE_SECS (5)
 
 
-uint8_t seg_f = 0b01110001;
-uint8_t seg_dp = 0b10000000;
+static volatile bool dirty = true;
+static volatile uint8_t ticks = 0;
 
-void main(void)
-{
-    // Initialize the device
+static void on_tmr0(void) {
+    ++ticks;
+    dirty = true;
+}
+
+void main(void) {
     SYSTEM_Initialize();
 
-    // If using interrupts in PIC18 High/Low Priority Mode you need to enable the Global High and Low Interrupts
-    // If using interrupts in PIC Mid-Range Compatibility Mode you need to enable the Global Interrupts
-    // Use the following macros to:
-
+    /* common anode , turn all digits off */
     LATD = 0xff;
-    //LATC = 0b101010101;
-    // Enable the Global Interrupt
     INTERRUPT_GlobalInterruptEnable();
 
-    printf("started up\r\n");
-    // Disable the Global Interrupts
-    //INTERRUPT_GlobalInterruptDisable();
-
-    //DIG4_COM_SetLow();
-    //LATD = 0b11110000;
-    LATC = seg_nums[1] | seg_dp;
-    while (1)
-    {
-        for (uint8_t dig = 0; dig < 5; ++dig) {
-            LATD = ~((uint8_t)1 << dig);
-            __delay_ms(3);
+    /* tmr0 at approx 1 sec */
+    TMR0_SetInterruptHandler(on_tmr0);
+    
+    si7021_soft_reset();
+    printf("\r\r\r\nstarted up\r\n");
+    
+    LATC = seg_nums[8] | seg_dp;
+    LATDbits.LATD0 = 0;
+    while (1) {
+                
+        if (ticks % UPDATE_SECS == 0 && dirty) {                       
+            si7021_meas_rh_hold();
+            __delay_ms(23);
+            float t_try = si7021_get_temp_postrh();
+            //printf("handled timer: %f\r\n", t_try);
+            RA0 = 0;
+            dirty = false;
         }
-#if 1
-        //for (uint8_t v = 0; v < 10; ++v) {
-           
         
-            //__delay_ms(200);
-        //}
-        
-//        LATD <<= 1;
-//        if (PORTD > (1 << 4)) {
-//            LATD = 1;
-//         
+//        for (uint8_t dig = 0; dig < 5; ++dig) {
+//            LATD = ~((uint8_t) 1 << dig);
+//            __delay_ms(3);
 //        }
-        
-#endif
     }
 }

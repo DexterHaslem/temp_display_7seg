@@ -58,7 +58,11 @@ void  INTERRUPT_Initialize (void)
 void __interrupt() INTERRUPT_InterruptManager (void)
 {
     // interrupt handler
-    if(PIE3bits.I2C1EIE == 1 && PIR3bits.I2C1EIF == 1)
+    if(PIE3bits.TMR0IE == 1 && PIR3bits.TMR0IF == 1)
+    {
+        TMR0_ISR();
+    }
+    else if(PIE3bits.I2C1EIE == 1 && PIR3bits.I2C1EIF == 1)
     {
         I2C1_InterruptHandler();
     }

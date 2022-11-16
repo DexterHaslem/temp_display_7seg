@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=temp_7seg.X
+PROJECTNAME=temp_display_7seg
 
 # Active Configuration
 DEFAULTCONF=default
