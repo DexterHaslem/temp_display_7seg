@@ -38,9 +38,11 @@ void si7021_meas_temp_nohold(void) {
 
 float si7021_get_temp_postrh(void) {
     //write(0xe0);  // read postrh
-    uint16_t tr = I2C1_Read2ByteRegister(ADDR, 0xe0);
-    RA0 = 1;
-    float tf = ((175.72*tr)/65536) - 46.85;
+    //uint16_t tr = I2C1_Read2ByteRegister(ADDR, 0xe0);
+    write(0xe0);
+    I2C1_ReadNBytes(ADDR, psc, 2);
+    uint16_t raw = (uint16_t)(scratch[0] << 8) | (scratch[1] & 0b11111100);
+    float tf = ((175.72f*raw)/65536) - 46.85f;
     return tf;
 }
        

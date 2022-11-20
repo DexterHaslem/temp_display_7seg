@@ -53,8 +53,8 @@
 /**
   Section: Macro Declarations
 */
-#define UART1_TX_BUFFER_SIZE 8
-#define UART1_RX_BUFFER_SIZE 8
+#define UART1_TX_BUFFER_SIZE 32
+#define UART1_RX_BUFFER_SIZE 32
 
 /**
   Section: Global Variables
@@ -111,8 +111,8 @@ void UART1_Initialize(void)
     // P3H 0; 
     U1P3H = 0x00;
 
-    // BRGS high speed; MODE Asynchronous 8-bit mode; RXEN enabled; TXEN enabled; ABDEN disabled; 
-    U1CON0 = 0xB0;
+    // BRGS high speed; MODE Asynchronous 8-bit mode; RXEN disabled; TXEN enabled; ABDEN disabled; 
+    U1CON0 = 0xA0;
 
     // RXBIMD Set RXBKIF on rising RX input; BRKOVR disabled; WUE disabled; SENDB disabled; ON enabled; 
     U1CON1 = 0x80;
@@ -120,8 +120,8 @@ void UART1_Initialize(void)
     // TXPOL not inverted; FLO off; C0EN Checksum Mode 0; RXPOL not inverted; RUNOVF RX input shifter stops all activity; STP Transmit 1Stop bit, receiver verifies first Stop bit; 
     U1CON2 = 0x00;
 
-    // BRGL 25; 
-    U1BRGL = 0x19;
+    // BRGL 51; 
+    U1BRGL = 0x33;
 
     // BRGH 0; 
     U1BRGH = 0x00;

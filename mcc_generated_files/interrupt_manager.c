@@ -1,11 +1,11 @@
 /**
-  Generated Interrupt Manager Source File
+  Generated Interrupt Manager Header File
 
   @Company:
     Microchip Technology Inc.
 
   @File Name:
-    interrupt_manager.c
+    interrupt_manager.h
 
   @Summary:
     This is the Interrupt Manager file generated using PIC10 / PIC12 / PIC16 / PIC18 MCUs
@@ -17,7 +17,7 @@
     Generation Information :
         Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.81.8
         Device            :  PIC18F47K42
-        Driver Version    :  2.04
+        Driver Version    :  2.12
     The generated drivers are tested against the following:
         Compiler          :  XC8 2.36 and above or later
         MPLAB 	          :  MPLAB X 6.00
@@ -51,18 +51,55 @@
 
 void  INTERRUPT_Initialize (void)
 {
-    // Disable Interrupt Priority Vectors (16CXXX Compatibility Mode)
-    INTCON0bits.IPEN = 0;
+    // Enable Interrupt Priority Vectors
+    INTCON0bits.IPEN = 1;
+
+    // Assign peripheral interrupt priority vectors
+
+    // TMRI - high priority
+    IPR6bits.TMR3IP = 1;
+
+
+    // ICEI - low priority
+    IPR3bits.I2C1EIP = 0;    
+
+    // ICRXI - low priority
+    IPR2bits.I2C1RXIP = 0;    
+
+    // ICI - low priority
+    IPR3bits.I2C1IP = 0;    
+
+    // ICTXI - low priority
+    IPR3bits.I2C1TXIP = 0;    
+
+    // TMRI - low priority
+    IPR3bits.TMR0IP = 0;    
+
+    // UTXI - low priority
+    IPR3bits.U1TXIP = 0;    
+
+    // URXI - low priority
+    IPR3bits.U1RXIP = 0;    
+
 }
 
-void __interrupt() INTERRUPT_InterruptManager (void)
+void __interrupt() INTERRUPT_InterruptManagerHigh (void)
+{
+   // interrupt handler
+    if(PIE6bits.TMR3IE == 1 && PIR6bits.TMR3IF == 1)
+    {
+        TMR3_ISR();
+    }
+    else
+    {
+        //Unhandled Interrupt
+    }
+}
+
+void __interrupt(low_priority) INTERRUPT_InterruptManagerLow (void)
 {
     // interrupt handler
-    if(PIE3bits.TMR0IE == 1 && PIR3bits.TMR0IF == 1)
-    {
-        TMR0_ISR();
-    }
-    else if(PIE3bits.I2C1EIE == 1 && PIR3bits.I2C1EIF == 1)
+    if(PIE3bits.I2C1EIE == 1 && PIR3bits.I2C1EIF == 1)
     {
         I2C1_InterruptHandler();
     }
@@ -77,6 +114,10 @@ void __interrupt() INTERRUPT_InterruptManager (void)
     else if(PIE3bits.I2C1TXIE == 1 && PIR3bits.I2C1TXIF == 1)
     {
         I2C1_InterruptHandler();
+    }
+    else if(PIE3bits.TMR0IE == 1 && PIR3bits.TMR0IF == 1)
+    {
+        TMR0_ISR();
     }
     else if(PIE3bits.U1TXIE == 1 && PIR3bits.U1TXIF == 1)
     {
