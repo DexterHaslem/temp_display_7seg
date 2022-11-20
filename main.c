@@ -2,14 +2,14 @@
 #include "segments.h"
 #include "si7021.h"
 
-/* tmr0 goes off every second, update display this often*/
-#define TEMP_UPDATE_RATE_TICKS (45)
+/* tmr0 goes off 250ms, update display this often*/
+#define TEMP_UPDATE_RATE_TICKS (2)
 
 static volatile uint8_t ticks = 0;
 static volatile bool parse_next = false;
 static volatile bool dirty = false;
 static uint8_t temp_scalar;
-static uint8_t digit_vals[3]; /* broken down digits for display */
+static uint8_t temp_vals[3]; /* broken down digits for display */
 static uint8_t disps[4];      /* actual display dec->7seg digit values */
 static uint8_t shiftcnt = 0;  /* number of digits to show (3 or 4 once temp read) */
 
@@ -23,17 +23,17 @@ static void req_parse_temp(void) {
     float temp_f = (temp_c * (9.0f/5.0f)) + 32.0f;
     temp_scalar = (uint8_t) (temp_f);
     uint8_t remain = (uint8_t)((temp_f - temp_scalar) * 10);
-    digit_vals[1] = (uint8_t)temp_scalar / 10 % 10;
-    digit_vals[2] = (uint8_t)temp_scalar % 10;
+    temp_vals[1] = (uint8_t)temp_scalar / 10 % 10;
+    temp_vals[2] = (uint8_t)temp_scalar % 10;
     
     /*display enable bits go from lsb msb so put right most display first*/
     disps[0] = seg_nums[remain];
-    disps[1] = seg_nums[digit_vals[2]] | seg_dp; 
-    disps[2] = seg_nums[digit_vals[1]];
-    disps[3] = seg_nums[digit_vals[0]];
+    disps[1] = seg_nums[temp_vals[2]] | seg_dp; 
+    disps[2] = seg_nums[temp_vals[1]];
+    disps[3] = seg_nums[temp_vals[0]];
     
     if (temp_scalar > 99) {
-        digit_vals[0] = 1;
+        temp_vals[0] = 1;
         /* if temp got to 200f we have bigger problems */
         shiftcnt = 4;
     } else {
@@ -43,8 +43,6 @@ static void req_parse_temp(void) {
 
 static uint8_t digit_cathode_shift = 0;
 static void isr_on_display_timer(void) {
-    //IO_RA0_Toggle();
-#if 1
     /* mux the pins in a very fast timer so they all appear visible
      at once to the human eye. also dont do this in the main logic loop 
      or else it will stutter on i2c updates etc */
@@ -55,7 +53,6 @@ static void isr_on_display_timer(void) {
             digit_cathode_shift = 0;
         }
     }
-#endif
 }
 
 void main(void) {
