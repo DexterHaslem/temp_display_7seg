@@ -3,11 +3,15 @@
 
 #include <stdint.h>
 
+/* PORTC bits mapped to segs
+  dp G F E D C B A
+*/
 const uint8_t seg_f = 0b01110001;
+const uint8_t seg_h = 0b01110110;
 const uint8_t seg_dp = 0b10000000;
+
 const uint8_t seg_nums[] ={
-    // PORTC bits mapped to segs
-    //dp G F E D C B A
+    
     0b00111111,
     0b00000110,
     0b01011011,
@@ -21,5 +25,5 @@ const uint8_t seg_nums[] ={
 };
 
 
-#endif	/* XC_HEADER_TEMPLATE_H */
+#endif
 
