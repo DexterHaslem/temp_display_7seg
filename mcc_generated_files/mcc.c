@@ -54,7 +54,7 @@ void SYSTEM_Initialize(void)
     I2C1_Initialize();
     PIN_MANAGER_Initialize();
     OSCILLATOR_Initialize();
-    TMR3_Initialize();
+    TMR1_Initialize();
     TMR0_Initialize();
     UART1_Initialize();
 }
@@ -67,8 +67,8 @@ void OSCILLATOR_Initialize(void)
     OSCCON3 = 0x00;
     // MFOEN disabled; LFOEN disabled; ADOEN disabled; SOSCEN disabled; EXTOEN disabled; HFOEN disabled; 
     OSCEN = 0x00;
-    // HFFRQ 2_MHz; 
-    OSCFRQ = 0x01;
+    // HFFRQ 4_MHz; 
+    OSCFRQ = 0x02;
     // TUN 0; 
     OSCTUNE = 0x00;
 }
@@ -89,8 +89,8 @@ void PMD_Initialize(void)
     PMD5 = 0x00;
     // DSMMD DSM1 enabled; CLC3MD CLC3 enabled; CLC4MD CLC4 enabled; SMT1MD SMT1 enabled; CLC1MD CLC1 enabled; CLC2MD CLC2 enabled; 
     PMD6 = 0x00;
-    // DMA1MD DMA1 enabled; DMA2MD DMA2 enabled; 
-    PMD7 = 0x00;
+    // DMA1MD DMA1 disabled; DMA2MD DMA2 disabled; 
+    PMD7 = 0x03;
 }
 
 
